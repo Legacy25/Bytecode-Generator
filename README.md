@@ -5,8 +5,26 @@ This is a Java program that generates bytecode for any program written in a smal
 
 This was done as an assignment in my CSE 505 Fundamentals of Programming Languages class taken by Professor Bharat Jayaraman at the University of Buffalo, with skeleton code for the Buffer, Lexer and Token provided.
 
+Build and run
+==================
+Compile all classes
+
+```
+$> javac *.java
+```
+
+Run the parser
+
+```
+$> java Parser
+```
+
+The Grammar
+==================
+
 Grammar for TinyPL (using EBNF notation) is as follows:
 
+```
  program ->  decls stmts end
  decls   ->  int idlist ;
  idlist  ->  id { , id } 
@@ -24,9 +42,11 @@ Grammar for TinyPL (using EBNF notation) is as follows:
 Lexical:   id is a single character; 
 	      int_lit is an unsigned integer;
 		 equality operator is =, not ==
+```
 
 Sample Program: Factorial
  
+``` 
 int n, i, f;
 n = 4;
 i = 1;
@@ -37,8 +57,11 @@ while (i < n) {
 }
 end
 
+```
+
 Sample Output bytecode for the Factorial program:
 
+```
 0: iconst_4
 1: istore_0
 2: iconst_1
@@ -58,3 +81,5 @@ Sample Output bytecode for the Factorial program:
 18: istore_2
 19: goto 6
 22: return
+
+```
