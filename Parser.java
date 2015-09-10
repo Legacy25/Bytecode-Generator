@@ -1,115 +1,70 @@
-/* 		OO PARSER AND BYTE-CODE GENERATOR FOR TINY PL
- 
-Grammar for TinyPL (using EBNF notation) is as follows:
-
- program ->  decls stmts end
- decls   ->  int idlist ;
- idlist  ->  id { , id } 
- stmts   ->  stmt [ stmts ]
- cmpdstmt->  '{' stmts '}'
- stmt    ->  assign | cond | loop
- assign  ->  id = expr ;
- cond    ->  if '(' rexp ')' cmpdstmt [ else cmpdstmt ]
- loop    ->  while '(' rexp ')' cmpdstmt  
- rexp    ->  expr (< | > | =) expr
- expr    ->  term   [ (+ | -) expr ]
- term    ->  factor [ (* | /) term ]
- factor  ->  int_lit | id | '(' expr ')'
- 
-Lexical:   id is a single character; 
-	      int_lit is an unsigned integer;
-		 equality operator is =, not ==
-
-Sample Program: Factorial
- 
-int n, i, f;
-n = 4;
-i = 1;
-f = 1;
-while (i < n) {
-  i = i + 1;
-  f= f * i;
-}
-end
-
-   Sample Program:  GCD
-   
-int x, y;
-x = 121;
-y = 132;
-while (x != y) {
-  if (x > y) 
-       { x = x - y; }
-  else { y = y - x; }
-}
-end
-
+/* 		OBJECT-ORIENTED RECOGNIZER FOR SIMPLE EXPRESSIONS
+ expr    -> term   (+ | -) expr | term
+ term    -> factor (* | /) term | factor
+ factor  -> number | real_number | '(' expr ')'     
  */
 
 public class Parser {
-	public static void main(String[] args)  {
-		System.out.println("Enter program and terminate with 'end'!\n");
+	public static void main(String[] args) {
+		System.out.println("Enter expression, end with semi-colon!\n");
 		Lexer.lex();
-		Program p = new Program();
-		p.program();
-		Code.output();
+		Expr e = new Expr();
+		e.expr();
 	}
 }
 
-class Program {
-	 
+class Expr { // expr -> term (+ | -) expr | term
+	Term t;
+	Expr e;
+	char op;
+
+	public void expr() {
+		t = new Term();
+		t.term();
+		if (Lexer.nextToken == Token.ADD_OP || Lexer.nextToken == Token.SUB_OP) {
+			op = Lexer.nextChar;
+			Lexer.lex();
+			e = new Expr();
+			e.expr();
+		}
+	}
 }
 
-class Decls {
-	 
+class Term { // term -> factor (* | /) term | factor
+	Factor f;
+	Term t;
+	char op;
+
+	public void term() {
+		f = new Factor();
+		f.factor();
+		if (Lexer.nextToken == Token.MULT_OP || Lexer.nextToken == Token.DIV_OP) {
+			op = Lexer.nextChar;
+			Lexer.lex();
+			t = new Term();
+			t.term();
+		}
+	}
 }
 
-class Idlist {
-	 
+class Factor { // factor -> number | '(' expr ')'
+	Expr e;
+	int i;
+
+	public void factor() {
+		switch (Lexer.nextToken) {
+		case Token.INT_LIT: // number
+			i = Lexer.intValue;
+			Lexer.lex();
+			break;
+		case Token.LEFT_PAREN: // '('
+			Lexer.lex();
+			e = new Expr();
+			e.expr();
+			Lexer.lex(); // skip over ')'
+			break;
+		default:
+			break;
+		}
+	}
 }
-
-class Stmt {
-	 
-} 
-
-class Stmts {
-	 
-}
-
-class Assign {
-	 
-}
-
-class Cond {
-	 
-}
-
-class Loop {
-	 
-}
-
-class Cmpdstmt {
-	 
-}
-
-class Rexpr {
-	 
-}
-
-class Expr {  
-	 
-}
-
-class Term {  
-	 
-}
-
-class Factor {  
-	 
-}
-
-class Code {
-	 
-}
-
-
